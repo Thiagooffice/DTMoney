@@ -1,14 +1,24 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../../service/api";
 import { Container } from "./styles";
 
+interface TransactionProps{
+    id: number,
+    title: string,
+    amount: number,
+    type: string,
+    category: string,
+    createdAt: string
+}
 
 export function TransactionsTable(){
+
+    const [transactions, setTransactions] = useState<TransactionProps[]>([])
 
     useEffect(()=>{
 
         api.get('transactions')
-        .then(response => console.log(response.data)
+        .then(response => setTransactions(response.data.transactions)
         )
 
     },[])
@@ -26,34 +36,28 @@ export function TransactionsTable(){
                 </thead>
 
                 <tbody>
-                    <tr>
+                    { transactions.map( transaction => (
+                        <tr key={transaction.id}>
                         <td>
-                            Desenvolvimento de website
+                            {transaction.title}
                         </td>
-                        <td className="deposit">
-                            R$12.000
+                        <td className={transaction.type}>
+                            {new Intl.NumberFormat('pt-BR', {
+                                style:  'currency',
+                                currency: 'BRL'
+                            }).format(transaction.amount)}
                         </td>
                         <td>
-                            Desenvolvimento
+                            {transaction.category}
                         </td>
                         <td>
-                            20/02/2022
+                        {new Intl.DateTimeFormat('pt-BR', {
+                            }).format(
+                                new Date(transaction.createdAt)
+                            )}
                         </td>
                     </tr>
-                    <tr>
-                        <td>
-                            Aluguel
-                        </td>
-                        <td className="withdraw">
-                            - R$1.100
-                        </td>
-                        <td>
-                            Casa
-                        </td>
-                        <td>
-                            17/02/2022
-                        </td>
-                    </tr>
+                    ) ) }
                 </tbody>
             </table>
         </Container>
